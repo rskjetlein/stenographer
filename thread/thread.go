@@ -380,6 +380,12 @@ func (t *Thread) ExportDebugHandlers(mux *http.ServeMux) {
 		}
 		t.mu.RUnlock()
 	})
+
+	mux.HandleFunc(prefix+"/delete", func w http.ResponseWriter, r *http.Request) {
+
+
+	}
+
 	mux.HandleFunc(prefix+"/index", func(w http.ResponseWriter, r *http.Request) {
 		w = httputil.Log(w, r, false)
 		defer log.Print(w)
