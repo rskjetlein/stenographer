@@ -382,7 +382,11 @@ func (t *Thread) ExportDebugHandlers(mux *http.ServeMux) {
 	})
 
 	mux.HandleFunc(prefix+"/delete", func w http.ResponseWriter, r *http.Request) {
+		w = httputil.Log(w, r, false)
+		defer log.Print(w)
+		w.Header().Set("Content-Type", "text/plain")
 
+		fmt.Fprintf(w, "Thread %d deleting (IDX: %q, PKT: %q)\n", t.id, t.indexPath, t.packetPath)
 
 	}
 
