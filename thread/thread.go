@@ -380,16 +380,28 @@ func (t *Thread) ExportDebugHandlers(mux *http.ServeMux) {
 		}
 		t.mu.RUnlock()
 	})
-
-	mux.HandleFunc(prefix+"/delete", func w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(prefix+"/delete", func(w http.ResponseWriter, r *http.Request) {
 		w = httputil.Log(w, r, false)
 		defer log.Print(w)
 		w.Header().Set("Content-Type", "text/plain")
-
 		fmt.Fprintf(w, "Thread %d deleting (IDX: %q, PKT: %q)\n", t.id, t.indexPath, t.packetPath)
+		vals := r.URL.Query()
+		file := t.files[vals.Get("name")]
+		if file == nil {
+			http.Error(w, "file not found", http.StatusNotFound)
+			return
+		}
+		t.mu.Lock()
+		v(2, "Thread %v removing %q", t.id, file)
+		names := vals.Get("name")
+		go tryToDeleteFile(t.getPacketFilePath(names))
+		go tryToDeleteFile(t.getIndexFilePath(names))
+		if err := t.untrackFile(names); err != nil {
+			log.Fatalf("Failure to untrack file: %v", err)
+		}
 
-	}
-
+		t.mu.Unlock()
+	})
 	mux.HandleFunc(prefix+"/index", func(w http.ResponseWriter, r *http.Request) {
 		w = httputil.Log(w, r, false)
 		defer log.Print(w)
