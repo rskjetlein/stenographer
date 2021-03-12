@@ -534,7 +534,7 @@ void RunThread(int thread, st::ProducerConsumerQueue* write_index,
       Error stats_err = v3->GetStats(&stats);
       if (SUCCEEDED(stats_err)) {
           uint64_t mb = (blocks * flag_blocksize_kb) / 1024;
-        LOG(INFO) << "Interface " << flag_iface << "Thread " << thread << " stats: MB=" << mb
+        LOG(INFO) << "Interface " << flag_iface << " Thread " << thread << " stats: MB=" << mb
                   << " secs=" << duration << " MBps=" << (mb / duration)
                   << " " << stats.String();
       } else {
